@@ -7,7 +7,7 @@ window.SONG_SINNER_CONFIG = {
     "image": "background.jpg" //will be used if you set mode to background
   },
   "streamer": {
-    "defaultName": "vampirateodessa",  //presets the streamer
+    "defaultName": "",  //presets the streamer
     "hideChangeOptionWhenDefault": true  //hides the streamer reset stuff whena a default is set
   },
   "songList": {
