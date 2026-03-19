@@ -122,3 +122,12 @@ All colors can be specified as:
 - The wheel automatically updates when new songs are added to your StreamerSongList queue
 - The application is read only, it will not remove songs from your StreamerSongList queue.
 	It is recommended to clear this queue at the start of your stream, and reset the spinner played list.
+
+## StreamLabs
+
+- In Editor, open your desired scene.
+- In the sources section, click the add button "+" and select browser source
+- In browser source setting, check the "Local file" checkbox.
+- Set the path to the SongSpinner.html file
+- Adjust width and height to your stream resolution
+- Remove any Custom CSS it generates automatically
