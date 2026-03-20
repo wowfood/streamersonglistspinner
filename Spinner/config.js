@@ -1,4 +1,4 @@
-window.SONG_SINNER_CONFIG = {
+window.SONG_SPINNER_CONFIG = {
   "debug": false,											   //turns on a status window just belwo spin, for debug purposes
   "wheelColors": ["#ff6b6b", "#4ecdc4", "#45b7d1", "#f9ca24", "#6c5ce7", "#a29bfe", "#fd79a8", "#fdcb6e"], //sets the colours used in the wheel spinner
   "background": {

@@ -25,7 +25,7 @@
 
     // Loads config from config.js global object (and keeps json loading disabled).
     ns.loadConfig = async function loadConfig() {
-        const scriptConfig = window.SONG_SINNER_CONFIG
+        const scriptConfig = window.SONG_SPINNER_CONFIG
         if(scriptConfig && typeof scriptConfig === "object") {
             ns.state.appConfig = ns.mergeConfig(ns.defaultConfig, scriptConfig)
             return
