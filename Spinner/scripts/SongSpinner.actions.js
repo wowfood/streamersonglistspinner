@@ -28,7 +28,10 @@
 
             ns.state.allSongs = data.list || []
 
-            const availableSongs = ns.state.allSongs.filter(song => !ns.state.playedSongs.includes(song.id))
+            const shouldExclude = ns.state.appConfig.songList?.excludePlayedSongs !== false
+            const availableSongs = shouldExclude
+                ? ns.state.allSongs.filter(song => !ns.state.playedSongs.includes(song.id))
+                : ns.state.allSongs
             const items = availableSongs.map(song => ({ label: ns.buildWheelLabel(song) }))
 
             ns.state.wheel.items = items.length ? items : [{ label: "No songs in queue" }]
@@ -84,7 +87,10 @@
 
             ns.state.allSongs = data.list || []
 
-            const availableSongs = ns.state.allSongs.filter(song => !ns.state.playedSongs.includes(song.id))
+            const shouldExclude = ns.state.appConfig.songList?.excludePlayedSongs !== false
+            const availableSongs = shouldExclude
+                ? ns.state.allSongs.filter(song => !ns.state.playedSongs.includes(song.id))
+                : ns.state.allSongs
             if(availableSongs.length === 0) {
                 ns.setStatus("No songs left to spin!")
                 ns.dom.spinButton.disabled = false

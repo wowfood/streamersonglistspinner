@@ -16,7 +16,9 @@ window.SongSpinner = window.SongSpinner || {}
             hideChangeOptionWhenDefault: true
         },
         songList: {
-            fields: ["artist", "title", "requester"]
+            fields: ["artist", "title", "requester"],
+            excludePlayedSongs: true,
+            playedListPosition: "right"
         },
         colors: {
             text: "#ffffff",
@@ -43,7 +45,9 @@ window.SongSpinner = window.SongSpinner || {}
         appConfig: JSON.parse(JSON.stringify(ns.defaultConfig)),
         countdownInterval: null,
         resizeTimeout: null,
-        isResizing: false
+        isResizing: false,
+        savedPlayedListWidth: null,
+        savedPlayedListMinWidth: null
     }
 
     // Cached DOM elements used throughout the app.
@@ -64,7 +68,10 @@ window.SongSpinner = window.SongSpinner || {}
         winnerDetails: document.getElementById("winnerDetails"),
         winnerConfetti: document.getElementById("winnerConfetti"),
         resizeHandle: document.getElementById("resizeHandle"),
-        playedListEl: document.getElementById("playedList")
+        playedListEl: document.getElementById("playedList"),
+        collapseBtn: document.getElementById("collapseBtn"),
+        collapseIcon: document.getElementById("collapseIcon"),
+        container: document.getElementById("container")
     }
 
     // Central status renderer honoring the debug config flag.

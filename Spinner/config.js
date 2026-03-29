@@ -11,7 +11,9 @@ window.SONG_SPINNER_CONFIG = {
     "hideChangeOptionWhenDefault": true  //hides the streamer reset stuff whena a default is set
   },
   "songList": {
-    "fields": ["artist", "title"] //"artist", "title", "requester", "donation"
+    "fields": ["artist", "title"], //"artist", "title", "requester", "donation"
+    "excludePlayedSongs": false,  //if true, played songs won't appear in the wheel. if false, all songs remain available
+    "playedListPosition": "right"  //left or right - controls which side the played list appears on
   },
   "colors": {
     "text": "#ffffff",

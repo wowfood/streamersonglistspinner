@@ -33,6 +33,10 @@ body{
     height:calc(100vh);
 }
 
+#container.played-list-left{
+    flex-direction: row-reverse;
+}
+
 #wheelSection{
     flex:1;
     display:flex;
@@ -71,12 +75,28 @@ body{
     background:var(--app-resize-handle-hover-bg);
 }
 
-#streamerSection{
+#playedListTop{
     display:flex;
-    margin-top: 1.25rem;
     align-items:center;
     gap:0.625rem;
-    margin-bottom:0.625rem;
+    padding:1.25rem;
+    padding-bottom:0;
+}
+
+#container.played-list-left #playedListTop{
+    flex-direction:row-reverse;
+}
+
+#playedList.collapsed #playedListTop{
+    padding:0.5rem;
+}
+
+#streamerSection{
+    display:flex;
+    align-items:center;
+    gap:0.625rem;
+    flex-wrap:wrap;
+    flex:1;
 }
 
 #streamerLabel{
@@ -137,6 +157,7 @@ input{
     justify-content:space-between;
     flex-direction: row;
     gap:0.625rem;
+    margin-bottom:0.625rem;
 }
 
 #playedList{
@@ -144,13 +165,56 @@ input{
     width:min(31.25rem, 40vw);
     min-width:18.75rem;
     max-width:50rem;
-    padding-left:1.25rem;
-    padding-right:1.25rem;
     display:flex;
     flex-direction:column;
     height:100%;
     overflow:hidden;
     background:var(--app-played-list-bg);
+    transition: width 0.3s ease;
+    position: relative;
+}
+
+#playedList.collapsed{
+    width:3rem;
+    min-width:3rem;
+}
+
+.collapse-button{
+    background:var(--app-button-bg);
+    color:var(--app-button-text);
+    border:none;
+    width:2rem;
+    height:2rem;
+    cursor:pointer;
+    border-radius:0.25rem;
+    font-size:1rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    margin:0;
+    flex-shrink:0;
+}
+
+.collapse-button:hover{
+    opacity:0.8;
+}
+
+#playedListContent{
+    display:flex;
+    flex-direction:column;
+    flex:1;
+    overflow:hidden;
+    padding:0 1.25rem;
+    padding-bottom:0;
+}
+
+#playedList.collapsed #playedListContent{
+    display:none;
+}
+
+#playedList.collapsed #streamerSection{
+    display:none;
 }
 
 #playedList h3{

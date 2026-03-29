@@ -60,6 +60,55 @@
         ns.dom.wheelContents.style.display = checkbox.checked ? "flex" : "none"
     }
 
+    // Toggles the played list collapse state.
+    ns.togglePlayedListCollapse = function togglePlayedListCollapse() {
+        if(!ns.dom.playedListEl || !ns.dom.collapseIcon) return
+
+        const isCollapsed = ns.dom.playedListEl.classList.contains("collapsed")
+        const position = ns.state.appConfig.songList?.playedListPosition || "right"
+
+        if(isCollapsed) {
+            // Expanding - restore saved width or clear inline styles to use CSS defaults
+            ns.dom.playedListEl.classList.remove("collapsed")
+            ns.dom.collapseIcon.innerText = position === "left" ? "▶" : "◀"
+
+            if(ns.state.savedPlayedListWidth) {
+                ns.dom.playedListEl.style.width = ns.state.savedPlayedListWidth
+                ns.dom.playedListEl.style.minWidth = ns.state.savedPlayedListMinWidth
+            } else {
+                // No saved width - clear inline styles to use CSS defaults
+                ns.dom.playedListEl.style.width = ""
+                ns.dom.playedListEl.style.minWidth = ""
+            }
+        } else {
+            // Collapsing - save current width then apply collapsed state
+            ns.state.savedPlayedListWidth = ns.dom.playedListEl.style.width || ""
+            ns.state.savedPlayedListMinWidth = ns.dom.playedListEl.style.minWidth || ""
+
+            ns.dom.playedListEl.classList.add("collapsed")
+            ns.dom.collapseIcon.innerText = position === "left" ? "◀" : "▶"
+
+            // Override any inline width with collapsed width
+            ns.dom.playedListEl.style.width = "3rem"
+            ns.dom.playedListEl.style.minWidth = "3rem"
+        }
+    }
+
+    // Applies the played list position from config.
+    ns.applyPlayedListPosition = function applyPlayedListPosition() {
+        if(!ns.dom.container || !ns.dom.collapseIcon) return
+
+        const position = (ns.state.appConfig.songList?.playedListPosition || "right").toLowerCase()
+
+        if(position === "left") {
+            ns.dom.container.classList.add("played-list-left")
+            ns.dom.collapseIcon.innerText = "▶"
+        } else {
+            ns.dom.container.classList.remove("played-list-left")
+            ns.dom.collapseIcon.innerText = "◀"
+        }
+    }
+
     // Builds simple celebratory confetti animation pieces.
     ns.runWinnerFanfare = function runWinnerFanfare() {
         if(!ns.dom.winnerConfetti) return
@@ -117,13 +166,23 @@
             e.preventDefault()
 
             const containerRect = document.getElementById("container").getBoundingClientRect()
-            const newWidth = containerRect.right - e.clientX - 10
-            const minWidth = 300 // 18.75rem
-            const maxWidth = 800 // 50rem
+            const position = ns.state.appConfig.songList?.playedListPosition || "right"
 
-            if(newWidth >= minWidth && newWidth <= maxWidth) {
-                ns.dom.playedListEl.style.width = `${newWidth}px`
-                ns.dom.playedListEl.style.minWidth = `${minWidth}px`
+            let newWidth
+            if(position === "left") {
+                newWidth = e.clientX - containerRect.left - 10
+            } else {
+                newWidth = containerRect.right - e.clientX - 10
+            }
+
+            const minWidthPx = 300 // 18.75rem
+            const maxWidthPx = 800 // 50rem
+            const containerWidth = containerRect.width
+
+            if(newWidth >= minWidthPx && newWidth <= maxWidthPx) {
+                const widthPercent = (newWidth / containerWidth) * 100
+                ns.dom.playedListEl.style.width = `${widthPercent}%`
+                ns.dom.playedListEl.style.minWidth = `${minWidthPx}px`
             }
         })
 

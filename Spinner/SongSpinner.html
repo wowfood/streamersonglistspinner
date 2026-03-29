@@ -24,27 +24,32 @@
     <div id="resizeHandle"></div>
 
     <div id="playedList">
-        <div id="streamerSection">
-            <input type="text" id="streamerInput" placeholder="Enter streamer name..." onchange="loadStreamer()" style="display:block;">
-            <span id="streamerLabel" style="display:none;"></span>
-            <button id="changeStreamerBtn" class="small-button" onclick="changeStreamer()" style="display:none;">Change</button>
+        <div id="playedListTop">
+            <button id="collapseBtn" class="collapse-button" onclick="togglePlayedListCollapse()" title="Collapse/Expand Played List">
+                <span id="collapseIcon">◀</span>
+            </button>
+            <div id="streamerSection">
+                <input type="text" id="streamerInput" placeholder="Enter streamer name..." onchange="loadStreamer()" style="display:block;">
+                <span id="streamerLabel" style="display:none;"></span>
+                <button id="changeStreamerBtn" class="small-button" onclick="changeStreamer()" style="display:none;">Change</button>
+            </div>
         </div>
-        
+        <div id="playedListContent">
         <div id="soungCounterSection">
             <h3>Played Songs:  <span id="playedCount">0</span></h3>
             <h3>Queued Songs:  <span id="availableCount">0</span></h3>
         </div>
         <ul id="playedSongsUl"></ul>
-        <div class="toggle-container">
-            <button id="resetBtn" class="small-button" onclick="resetPlayed()" style="display:none">Reset</button>
-            <div class="toggle-right">
-                <span class="toggle-label">Toggle Wheel</span>
-                <label class="switch">
-                    <input type="checkbox" id="showWheelCheckbox" onchange="toggleWheel(this)" checked>
-                    <span class="slider round"></span>
-                </label>
+            <div class="toggle-container">
+                <button id="resetBtn" class="small-button" onclick="resetPlayed()" style="display:none">Reset</button>
+                <div class="toggle-right">
+                    <span class="toggle-label">Toggle Wheel</span>
+                    <label class="switch">
+                        <input type="checkbox" id="showWheelCheckbox" onchange="toggleWheel(this)" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
             </div>
-        </div>
     </div>
     </div>
 </div>

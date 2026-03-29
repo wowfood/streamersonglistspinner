@@ -4,6 +4,7 @@
         await ns.loadConfig()
         ns.applyThemeConfig()
         ns.applyBackgroundConfig()
+        ns.applyPlayedListPosition()
 
         ns.createWheel([{ label: "Enter streamer name above" }])
         ns.setupWheelResizeObserver()
@@ -33,6 +34,7 @@
     window.toggleWheel = (checkbox) => ns.toggleWheel(checkbox)
     window.resetPlayed = () => ns.resetPlayed()
     window.closeWinnerModal = () => ns.closeWinnerModal()
+    window.togglePlayedListCollapse = () => ns.togglePlayedListCollapse()
 
     // Allows closing the winner modal with Escape.
     document.addEventListener("keydown", (event) => {
