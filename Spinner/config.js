@@ -12,7 +12,7 @@ window.SONG_SPINNER_CONFIG = {
   },
   "songList": {
     "fields": ["artist", "title"], //"artist", "title", "requester", "donation"
-    "excludePlayedSongs": false,  //if true, played songs won't appear in the wheel. if false, all songs remain available
+    "excludePlayedSongs": true,  //if true, played songs won't appear in the wheel. if false, all songs remain available
     "playedListPosition": "right"  //left or right - controls which side the played list appears on
   },
   "colors": {

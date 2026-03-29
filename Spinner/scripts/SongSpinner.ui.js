@@ -27,14 +27,13 @@
     ns.updatePlayedList = function updatePlayedList() {
         ns.dom.playedSongsUl.innerHTML = ""
 
-        if(!ns.state.streamer || !ns.state.allSongs.length) {
+        if(!ns.state.streamer) {
             ns.updateStats()
             return
         }
 
         for(let i = ns.state.playedSongs.length - 1; i >= 0; i--) {
-            const songId = ns.state.playedSongs[i]
-            const song = ns.state.allSongs.find(s => s.id === songId)
+            const song = ns.state.playedSongs[i]
             if(song) {
                 const li = document.createElement("li")
                 li.innerText = ns.createPlayedSongText(song)

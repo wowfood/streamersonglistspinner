@@ -30,7 +30,7 @@
 
             const shouldExclude = ns.state.appConfig.songList?.excludePlayedSongs !== false
             const availableSongs = shouldExclude
-                ? ns.state.allSongs.filter(song => !ns.state.playedSongs.includes(song.id))
+                ? ns.state.allSongs.filter(song => !ns.state.playedSongs.some(played => played.song?.id === song.song?.id))
                 : ns.state.allSongs
             const items = availableSongs.map(song => ({ label: ns.buildWheelLabel(song) }))
 
@@ -89,7 +89,7 @@
 
             const shouldExclude = ns.state.appConfig.songList?.excludePlayedSongs !== false
             const availableSongs = shouldExclude
-                ? ns.state.allSongs.filter(song => !ns.state.playedSongs.includes(song.id))
+                ? ns.state.allSongs.filter(song => !ns.state.playedSongs.some(played => played.song?.id === song.song?.id))
                 : ns.state.allSongs
             if(availableSongs.length === 0) {
                 ns.setStatus("No songs left to spin!")
@@ -106,7 +106,7 @@
 
             setTimeout(() => {
                 const winner = availableSongs[winnerIndex]
-                ns.state.playedSongs.push(winner.id)
+                ns.state.playedSongs.push(winner)
                 ns.savePlayedSongsForStreamer()
 
                 ns.setStatus(`Winner: ${items[winnerIndex].label}`)
