@@ -1,6 +1,7 @@
 ;(function(ns) {
     // Loads queue for the current streamer and refreshes wheel + played list UI.
-    ns.loadStreamer = async function loadStreamer() {
+    // silent=true skips broadcasting set_streamer (used when the overlay responds to a sync command).
+    ns.loadStreamer = async function loadStreamer(silent) {
         ns.state.streamer = ns.dom.streamerInput.value.trim()
         if(!ns.state.streamer) {
             ns.setStatus("Please enter a streamer name")
@@ -47,6 +48,7 @@
             ns.setStatus(`Loaded ${items.length} songs. Press SPIN!`)
             ns.updateStats()
             ns.updatePlayedList()
+            if(!silent) ns.sync?.send('set_streamer', { streamer: ns.state.streamer })
         } catch(E) {
             console.error("Full error details:", E)
             console.error("Error name:", E.name)
@@ -104,8 +106,16 @@
             ns.setStatus("Spinning...")
             ns.state.wheel.spinToItem(winnerIndex, 5000)
 
+            const winner = availableSongs[winnerIndex]
+            const queuePosition = ns.state.allSongs.indexOf(winner) + 1
+            ns.sync?.send('spin_command', {
+                streamer: ns.state.streamer,
+                songId: winner.song?.id,
+                songData: winner,
+                queuePosition
+            })
+
             setTimeout(() => {
-                const winner = availableSongs[winnerIndex]
                 ns.state.playedSongs.push(winner)
                 ns.savePlayedSongsForStreamer()
 
@@ -143,12 +153,40 @@
     }
 
     // Clears played history for the current streamer.
-    ns.resetPlayed = function resetPlayed() {
+    // silent=true skips broadcasting (used when the overlay receives a reset_played command).
+    ns.resetPlayed = function resetPlayed(silent) {
         if(!ns.state.streamer) return
 
         ns.state.playedSongs = []
         ns.savePlayedSongsForStreamer()
         ns.setStatus(`Played songs reset for ${ns.state.streamer}`)
         ns.updatePlayedList()
+        if(!silent) ns.sync?.send('reset_played', { streamer: ns.state.streamer })
+    }
+
+    // Spins the wheel to a specific song (used by the overlay when it receives a spin_command).
+    ns.spinToSong = function spinToSong(songId, songData) {
+        if(!ns.state.allSongs || !ns.state.allSongs.length) return
+
+        const shouldExclude = ns.state.appConfig.songList?.excludePlayedSongs !== false
+        const availableSongs = shouldExclude
+            ? ns.state.allSongs.filter(song => !ns.state.playedSongs.some(played => played.song?.id === song.song?.id))
+            : ns.state.allSongs
+
+        const winnerIndex = availableSongs.findIndex(song => song.song?.id === songId)
+        if(winnerIndex === -1) return
+
+        const items = availableSongs.map(song => ({ label: ns.buildWheelLabel(song) }))
+        ns.state.wheel.items = items
+        ns.state.wheel.spinToItem(winnerIndex, 5000)
+
+        const winner = availableSongs[winnerIndex]
+        setTimeout(() => {
+            ns.state.playedSongs.push(winner)
+            ns.savePlayedSongsForStreamer()
+            ns.showWinnerModal(winner)
+            ns.updatePlayedList()
+            ns.updateStats()
+        }, 5000)
     }
 }) (window.SongSpinner)

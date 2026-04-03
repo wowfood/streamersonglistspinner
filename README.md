@@ -60,6 +60,19 @@ A web-based song queue spinner for streamers using StreamerSongList. Spin a whee
 
 - This allows you to click buttons and interact with the spinner
 
+#### Optional: OBS Dock Setup (Server Mode)
+
+If you want the control buttons to be hidden on stream while remaining fully interactive, you can run the spinner as a local server and split it into a Browser Source (overlay, no buttons) and a Browser Dock (control panel, full UI).
+
+1. Install [Node.js](https://nodejs.org/en/download) if you haven't already — download and run the installer, then restart your PC
+2. Double-click `install.bat` in the spinner folder — this installs the required dependencies (only needed once)
+3. Double-click `start.bat` to start the server
+4. In OBS, add a **Browser Source** to your scene with URL `http://localhost:3000/` — this is the on-stream overlay (no buttons visible)
+5. In OBS, go to **View > Docks > Custom Browser Docks**, add a dock with URL `http://localhost:3000/control` — this is your control panel, docked inside OBS
+6. Use the dock to enter the streamer name and spin; the overlay updates automatically
+
+> **Note:** `start.bat` must be running whenever you stream. The server only runs locally on your machine.
+
 ### StreamLabs Setup
 
 1. In Editor, open your desired scene
@@ -89,6 +102,14 @@ A web-based song queue spinner for streamers using StreamerSongList. Spin a whee
    ![StreamLabs Interact](images/streamlabs-interact.png)
 
 - This allows you to click buttons and interact with the spinner
+
+#### Optional: StreamLabs Dock Setup (Server Mode)
+
+StreamLabs also supports custom browser docks. Follow steps 1–3 of the OBS Dock Setup above to install Node.js and start the server, then:
+
+1. In StreamLabs, go to **View > Custom Browser Docks** (or equivalent in your version)
+2. Add a dock with URL `http://localhost:3000/control` — this is your control panel
+3. Update your Browser Source URL from the local file path to `http://localhost:3000/` — this is the on-stream overlay
 
 ## Configuration
 
@@ -198,6 +219,39 @@ All colors can be specified as:
 - Hex values (e.g., `"#ffffff"`)
 - RGB/RGBA values (e.g., `"rgba(0, 0, 0, 0.7)"`)
 - Named colors (e.g., `"wheat"`, `"red"`)
+
+---
+
+## AutoPlay (Automatic IRC Chat Commands)
+
+> **Requires:** Server mode (Node.js installed, `install.bat` run once, `start.bat` running) and a configured Twitch account in `server-config.js`.
+
+When enabled, the spinner automatically sends StreamerSongList bot commands to your Twitch chat:
+- **`!setSong <position> to 1`** — sent when a song is spun, moving it to position 1 in the queue
+- **`!setPlayed`** — sent when you close the winner modal, marking the song as played
+
+### Twitch Setup
+
+1. Go to [dev.twitch.tv/console](https://dev.twitch.tv/console) and click **Register Your Application**
+2. Set the name to anything (e.g. `Song Spinner`), category to **Chat Bot**
+3. Set the OAuth Redirect URL to `http://localhost:3000/auth/callback`
+4. Click **Create**, then copy the **Client ID**
+5. Click **New Secret** and copy the **Client Secret**
+6. Open `server-config.js` and fill in your Twitch username, Client ID, and Client Secret
+7. Start the server (`start.bat`), then visit `http://localhost:3000/auth` in your browser to authorize
+8. After authorizing, the token is saved automatically to `server-token.json`
+
+### AutoPlay Configuration
+
+Edit `server-config.js` to enable or disable AutoPlay:
+
+```javascript
+autoPlay: true   // set to false to disable
+```
+
+Set to `false` to disable all AutoPlay commands without removing your Twitch credentials.
+
+---
 
 ## Features
 

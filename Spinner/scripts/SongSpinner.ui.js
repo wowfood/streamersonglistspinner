@@ -55,12 +55,15 @@
     }
 
     // Shows or hides the wheel panel based on checkbox state.
-    ns.toggleWheel = function toggleWheel(checkbox) {
+    // silent=true skips broadcasting (used when applying a sync'd state from the other client).
+    ns.toggleWheel = function toggleWheel(checkbox, silent) {
         ns.dom.wheelContents.style.display = checkbox.checked ? "flex" : "none"
+        if (!silent) ns.sync?.send('set_wheel_visible', { visible: checkbox.checked })
     }
 
     // Toggles the played list collapse state.
-    ns.togglePlayedListCollapse = function togglePlayedListCollapse() {
+    // silent=true skips broadcasting (used when applying a sync'd state from the other client).
+    ns.togglePlayedListCollapse = function togglePlayedListCollapse(silent) {
         if(!ns.dom.playedListEl || !ns.dom.collapseIcon) return
 
         const isCollapsed = ns.dom.playedListEl.classList.contains("collapsed")
@@ -91,6 +94,8 @@
             ns.dom.playedListEl.style.width = "3rem"
             ns.dom.playedListEl.style.minWidth = "3rem"
         }
+
+        if(!silent) ns.sync?.send('set_collapse', { collapsed: !isCollapsed })
     }
 
     // Applies the played list position from config.
@@ -142,9 +147,11 @@
     }
 
     // Closes winner modal.
-    ns.closeWinnerModal = function closeWinnerModal() {
+    // silent=true skips broadcasting (used when applying a sync'd close from the other client).
+    ns.closeWinnerModal = function closeWinnerModal(silent) {
         if(!ns.dom.winnerModal) return
         ns.dom.winnerModal.style.display = "none"
+        if(!silent) ns.sync?.send('close_winner_modal', {})
     }
 
     // Wires mouse handlers for resizing the played list panel.
@@ -190,6 +197,10 @@
                 ns.state.isResizing = false
                 document.body.style.cursor = "default"
                 document.body.style.userSelect = "auto"
+                // Sync final width to overlay
+                const w = ns.dom.playedListEl.style.width
+                const mw = ns.dom.playedListEl.style.minWidth
+                if(w) ns.sync?.send('set_played_list_width', { width: w, minWidth: mw })
             }
         })
     }

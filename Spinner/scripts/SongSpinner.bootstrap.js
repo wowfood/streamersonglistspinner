@@ -43,6 +43,6 @@
         }
     })
 
-    // Start the application.
-    ns.initialize()
+    // Start the application, then connect to the sync server as the control panel.
+    ns.initialize().then(() => ns.sync.init('control'))
 }) (window.SongSpinner)
