@@ -32,7 +32,7 @@
             return
         }
 
-        for(let i = 0; i <= ns.state.playedSongs.length; i++) {
+        for(let i = 0; i < ns.state.playedSongs.length; i++) {
             const song = ns.state.playedSongs[i]
             if(song) {
                 const li = document.createElement("li")
@@ -146,12 +146,14 @@
         ns.runWinnerFanfare()
     }
 
-    // Closes winner modal.
+    // Closes winner modal and schedules a played list refresh 5 seconds later.
     // silent=true skips broadcasting (used when applying a sync'd close from the other client).
     ns.closeWinnerModal = function closeWinnerModal(silent) {
         if(!ns.dom.winnerModal) return
         ns.dom.winnerModal.style.display = "none"
         if(!silent) ns.sync?.send('close_winner_modal', {})
+        clearTimeout(ns.state.playedRefreshTimeout)
+        ns.state.playedRefreshTimeout = setTimeout(() => ns.refreshQueueData(), 5000)
     }
 
     // Wires mouse handlers for resizing the played list panel.

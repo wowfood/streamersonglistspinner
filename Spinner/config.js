@@ -7,7 +7,7 @@ window.SONG_SPINNER_CONFIG = {
     "image": "background.jpg" //will be used if you set mode to background
   },
   "streamer": {
-    "defaultName": "",  //presets the streamer
+    "defaultName": "wowfood",  //presets the streamer
     "hideChangeOptionWhenDefault": true  //hides the streamer reset stuff whena a default is set
   },
   "songList": {

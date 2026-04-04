@@ -39,6 +39,7 @@
                 if (value) {
                     try {
                         await ns.refreshQueueData()
+                        ns.sync?.send('set_streamer', { streamer: ns.state.streamer })
                     } catch (err) {
                         console.error("Auto refresh failed:", err)
                     }

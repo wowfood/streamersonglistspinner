@@ -1,15 +1,15 @@
 module.exports = {
     twitch: {
         // Your Twitch username (lowercase)
-        username: '',
+        username: 'wowfood',
 
         // --- OAuth app credentials ---
         // 1. Go to https://dev.twitch.tv/console and click "Register Your Application"
         // 2. Set name to anything (e.g. "Song Spinner"), category to "Chat Bot"
         // 3. Set OAuth Redirect URL to: http://localhost:3000/auth/callback
         // 4. Copy the Client ID here, then click "New Secret" and copy that too
-        clientId: '',
-        clientSecret: ''
+        clientId: 'drqs6lplcj63ky4r40fh7yznyv44wd',
+        clientSecret: '21le7g5c0f2bffiyz50dpihxk25ytc'
 
         // oauthToken is stored automatically in server-token.json after you visit http://localhost:3000/auth
     },

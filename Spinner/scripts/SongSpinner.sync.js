@@ -29,12 +29,9 @@
             console.log('[Sync] Connected as', role)
 
             if (role === 'control') {
-                // Push local localStorage state to server so it survives server restarts
-                const raw = localStorage.getItem('streamerPlayedSongs')
-                const playedSongs = raw ? JSON.parse(raw) : {}
+                // Push current streamer to server so the overlay can sync on reconnect
                 sync.send('client_state_push', {
-                    streamer: ns.state.streamer || '',
-                    playedSongs
+                    streamer: ns.state.streamer || ''
                 })
             }
         }
