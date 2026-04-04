@@ -7,34 +7,14 @@
             return
         }
 
-        ns.loadPlayedSongsForStreamer()
-
-        const encodedStreamer = encodeURIComponent(ns.state.streamer)
+        const encodedStreamer = encodeURIComponent(ns.state.streamer).trim().toLowerCase()
 
         // Always use full API URL (no backend proxy in this app)
         ns.state.api = `https://api.streamersonglist.com/v1/streamers/${encodedStreamer}/queue`
         ns.setStatus("Loading songs...")
 
         try {
-            console.log("Fetching from:", ns.state.api)
-            const res = await fetch(ns.state.api)
-            console.log("Response status:", res.status, res.statusText)
-
-            if(!res.ok) {
-                throw new Error(`HTTP ${res.status}: ${res.statusText}`)
-            }
-
-            const data = await res.json()
-
-            ns.state.allSongs = data.list || []
-
-            const shouldExclude = ns.state.appConfig.songList?.excludePlayedSongs !== false
-            const availableSongs = shouldExclude
-                ? ns.state.allSongs.filter(song => !ns.state.playedSongs.some(played => played.song?.id === song.song?.id))
-                : ns.state.allSongs
-            const items = availableSongs.map(song => ({ label: ns.buildWheelLabel(song) }))
-
-            ns.state.wheel.items = items.length ? items : [{ label: "No songs in queue" }]
+            const availableSongs = await ns.refreshQueueData()
 
             ns.dom.streamerInput.style.display = "none"
             ns.dom.streamerLabel.innerText = `Streamer: ${ns.state.streamer}`
@@ -44,9 +24,7 @@
             ns.dom.changeStreamerBtn.style.display = usingLockedDefault ? "none" : "inline"
             ns.dom.resetBtn.style.display = "inline"
 
-            ns.setStatus(`Loaded ${items.length} songs. Press SPIN!`)
-            ns.updateStats()
-            ns.updatePlayedList()
+            ns.setStatus(`Loaded ${availableSongs.length} songs. Press SPIN!`)
         } catch(E) {
             console.error("Full error details:", E)
             console.error("Error name:", E.name)
@@ -57,7 +35,7 @@
         }
     }
 
-    // Spins the wheel, selects a winner, persists it, and starts cooldown countdown.
+    // Spins the wheel, selects a winner, and starts cooldown countdown.
     ns.spin = async function spin() {
         if(!ns.state.api) {
             ns.setStatus("Please enter a streamer name first")
@@ -75,42 +53,23 @@
         ns.setStatus("Fetching queue...")
 
         try {
-            console.log("Fetching from:", ns.state.api)
-            const res = await fetch(ns.state.api)
-            console.log("Response status:", res.status, res.statusText)
+            const availableSongs = await ns.refreshQueueData()
 
-            if(!res.ok) {
-                throw new Error(`HTTP ${res.status}: ${res.statusText}`)
-            }
-
-            const data = await res.json()
-
-            ns.state.allSongs = data.list || []
-
-            const shouldExclude = ns.state.appConfig.songList?.excludePlayedSongs !== false
-            const availableSongs = shouldExclude
-                ? ns.state.allSongs.filter(song => !ns.state.playedSongs.some(played => played.song?.id === song.song?.id))
-                : ns.state.allSongs
             if(availableSongs.length === 0) {
                 ns.setStatus("No songs left to spin!")
                 ns.dom.spinButton.disabled = false
                 return
             }
 
-            const items = availableSongs.map(song => ({ label: ns.buildWheelLabel(song) }))
-            ns.state.wheel.items = items
-
-            const winnerIndex = Math.floor(Math.random() * items.length)
+            const winnerIndex = Math.floor(Math.random() * availableSongs.length)
             ns.setStatus("Spinning...")
             ns.state.wheel.spinToItem(winnerIndex, 5000)
 
-            setTimeout(() => {
+            setTimeout(async () => {
                 const winner = availableSongs[winnerIndex]
-                ns.state.playedSongs.push(winner)
-                ns.savePlayedSongsForStreamer()
-
-                ns.setStatus(`Winner: ${items[winnerIndex].label}`)
+                ns.setStatus(`Winner: ${ns.state.wheel.items[winnerIndex]?.label || ns.buildWheelLabel(winner)}`)
                 ns.showWinnerModal(winner)
+                await ns.fetchPlayedSongs()
                 ns.updatePlayedList()
 
                 let countdown = 1
@@ -142,12 +101,11 @@
         }
     }
 
-    // Clears played history for the current streamer.
+    // Clears local played state for the current session (does not affect the API).
     ns.resetPlayed = function resetPlayed() {
         if(!ns.state.streamer) return
 
         ns.state.playedSongs = []
-        ns.savePlayedSongsForStreamer()
         ns.setStatus(`Played songs reset for ${ns.state.streamer}`)
         ns.updatePlayedList()
     }

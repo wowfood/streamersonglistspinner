@@ -50,6 +50,12 @@
         root.style.setProperty("--app-button-bg", colors.buttonBackground || defaults.buttonBackground)
         root.style.setProperty("--app-button-text", colors.buttonText || defaults.buttonText)
         root.style.setProperty("--app-pointer-color", colors.pointer || defaults.pointer)
+
+        const playedList = ns.state.appConfig.playedList || {}
+        const plDefaults = ns.defaultConfig.playedList
+        root.style.setProperty("--app-played-list-font-family", playedList.fontFamily || plDefaults.fontFamily)
+        root.style.setProperty("--app-played-list-font-size", playedList.fontSize || plDefaults.fontSize)
+        root.style.setProperty("--app-played-list-max-lines", playedList.maxLines != null ? playedList.maxLines : plDefaults.maxLines)
     }
 
     // Applies configured body background mode (color, transparent, image).
