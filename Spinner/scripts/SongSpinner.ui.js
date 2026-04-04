@@ -19,7 +19,7 @@
     ns.updateStats = function updateStats() {
         ns.dom.playedCount.innerText = ns.state.playedSongs.length
         if(ns.dom.availableCount) {
-            ns.dom.availableCount.innerText = Math.max(0, ns.state.allSongs.length - ns.state.playedSongs.length)
+            ns.dom.availableCount.innerText = Math.max(0, ns.state.allSongs.length)
         }
     }
 
@@ -32,7 +32,7 @@
             return
         }
 
-        for(let i = ns.state.playedSongs.length - 1; i >= 0; i--) {
+        for(let i = 0; i <= ns.state.playedSongs.length; i++) {
             const song = ns.state.playedSongs[i]
             if(song) {
                 const li = document.createElement("li")

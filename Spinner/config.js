@@ -12,8 +12,14 @@ window.SONG_SPINNER_CONFIG = {
   },
   "songList": {
     "fields": ["artist", "title"], //"artist", "title", "requester", "donation"
-    "excludePlayedSongs": true,  //if true, played songs won't appear in the wheel. if false, all songs remain available
-    "playedListPosition": "right"  //left or right - controls which side the played list appears on
+    "excludePlayedSongs": false,  //if true, played songs won't appear in the wheel. if false, all songs remain available
+    "playedListPosition": "right",  //left or right - controls which side the played list appears on
+    "playHistoryPeriod": "week"  //period for play history: stream, day, week, month, all
+  },
+  "playedList": {
+    "fontFamily": "sans-serif",     //font family for played list items (e.g. "Arial", "Georgia", "monospace")
+    "fontSize": "0.875rem",         //font size for played list items (e.g. "0.875rem", "14px", "1rem")
+    "maxLines": 2                  //max lines before text is clipped with ellipsis. set higher for multiline entries
   },
   "colors": {
     "text": "#ffffff",

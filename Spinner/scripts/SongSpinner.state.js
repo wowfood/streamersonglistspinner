@@ -18,7 +18,8 @@ window.SongSpinner = window.SongSpinner || {}
         songList: {
             fields: ["artist", "title", "requester"],
             excludePlayedSongs: true,
-            playedListPosition: "right"
+            playedListPosition: "right",
+            playHistoryPeriod: "stream"
         },
         colors: {
             text: "#ffffff",
@@ -31,6 +32,11 @@ window.SongSpinner = window.SongSpinner || {}
             buttonBackground: "#ffffff",
             buttonText: "#111111",
             pointer: "wheat"
+        },
+        playedList: {
+            fontFamily: "sans-serif",
+            fontSize: "0.875rem",
+            maxLines: 1
         }
     }
 

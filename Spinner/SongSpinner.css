@@ -9,6 +9,9 @@
     --app-button-bg: #ffffff;
     --app-button-text: #111111;
     --app-pointer-color: wheat;
+    --app-played-list-font-family: sans-serif;
+    --app-played-list-font-size: 0.875rem;
+    --app-played-list-max-lines: 1;
 }
 
 body{
@@ -234,10 +237,14 @@ input{
     margin:0.25rem 0;
     background:var(--app-played-item-bg);
     border-radius:0.25rem;
-    font-size:0.875rem;
+    font-size:var(--app-played-list-font-size);
+    font-family:var(--app-played-list-font-family);
+    line-height:1.4em;
+    max-height:calc(var(--app-played-list-max-lines) * 1.4em + 1rem);
     overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--app-played-list-max-lines);
 }
 
 .toggle-container{
