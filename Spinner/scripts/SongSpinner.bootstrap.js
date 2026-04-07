@@ -25,6 +25,30 @@
 
         ns.updateStats()
         ns.updatePlayedList()
+        ns.startStreamerAutoRefresh()
+    }
+
+    ns.startStreamerAutoRefresh = function startStreamerAutoRefresh() {
+        if (ns.state.autoRefreshRunning) return
+        ns.state.autoRefreshRunning = true
+
+        const loop = async () => {
+            while (ns.state.autoRefreshRunning) {
+                const value = ns.state.streamer?.trim()
+
+                if (value) {
+                    try {
+                        await ns.refreshQueueData()
+                    } catch (err) {
+                        console.error("Auto refresh failed:", err)
+                    }
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 30000))
+            }
+        }
+
+        loop()
     }
 
     // Binds global handlers used by inline HTML event attributes.

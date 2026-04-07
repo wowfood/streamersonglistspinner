@@ -1,32 +1,61 @@
 ;(function(ns) {
-    // Reads all streamer song-history data from localStorage.
-    ns.getStreamerData = function getStreamerData() {
-        return JSON.parse(localStorage.getItem("streamerPlayedSongs") || "{}")
-    }
-
-    // Persists streamer song-history data to localStorage.
-    ns.saveStreamerData = function saveStreamerData(data) {
-        localStorage.setItem("streamerPlayedSongs", JSON.stringify(data))
-    }
-
-    // Loads played song IDs for the currently selected streamer.
-    ns.loadPlayedSongsForStreamer = function loadPlayedSongsForStreamer() {
+    // Fetches play history for the current stream from the API and updates state.playedSongs.
+    ns.fetchPlayedSongs = async function fetchPlayedSongs() {
         if(!ns.state.streamer) {
             ns.state.playedSongs = []
             return
         }
 
-        const allData = ns.getStreamerData()
-        ns.state.playedSongs = allData[ns.state.streamer] || []
+        const encodedStreamer = encodeURIComponent(ns.state.streamer).trim().toLowerCase()
+        const period = ns.state.appConfig.songList?.playHistoryPeriod || ns.defaultConfig.songList.playHistoryPeriod
+        const url = `https://api.streamersonglist.com/v1/streamers/${encodedStreamer}/playHistory?size=200&current=0&period=${encodeURIComponent(period)}`
+
+        try {
+            const res = await fetch(url)
+            if(!res.ok) throw new Error(`HTTP ${res.status}`)
+            const data = await res.json()
+            ns.state.playedSongs = data.items || []
+        } catch(e) {
+            console.warn("Failed to fetch play history:", e.message)
+            ns.state.playedSongs = []
+        }
     }
 
-    // Saves played song IDs for the currently selected streamer.
-    ns.savePlayedSongsForStreamer = function savePlayedSongsForStreamer() {
-        if(!ns.state.streamer) return
+    // Matches a queue item against a play history item by ID, falling back to artist+title.
+    ns.songMatchesPlayed = function songMatchesPlayed(queueItem, playedItem) {
+        const qSong = queueItem?.song
+        const pSong = playedItem?.song
+        if(!qSong || !pSong) return false
+        if(qSong.id != null && pSong.id != null) return qSong.id === pSong.id
+        return qSong.artist?.toLowerCase() === pSong.artist?.toLowerCase()
+            && qSong.title?.toLowerCase() === pSong.title?.toLowerCase()
+    }
 
-        const allData = ns.getStreamerData()
-        allData[ns.state.streamer] = ns.state.playedSongs
-        ns.saveStreamerData(allData)
+    // Fetches queue and play history concurrently, updates wheel items, stats, and played list.
+    // Returns the filtered available songs array.
+    ns.refreshQueueData = async function refreshQueueData() {
+        const [queueRes] = await Promise.all([
+            fetch(ns.state.api),
+            ns.fetchPlayedSongs()
+        ])
+
+        if(!queueRes.ok) throw new Error(`HTTP ${queueRes.status}: ${queueRes.statusText}`)
+
+        const data = await queueRes.json()
+        ns.state.allSongs = data.list || []
+
+        const shouldExclude = ns.state.appConfig.songList?.excludePlayedSongs !== false
+        const availableSongs = shouldExclude
+            ? ns.state.allSongs.filter(song => !ns.state.playedSongs.some(played => ns.songMatchesPlayed(song, played)))
+            : ns.state.allSongs
+
+        const items = availableSongs.map(song => ({ label: ns.buildWheelLabel(song) }))
+        ns.state.wheel.items = items.length ? items : [{ label: "No songs in queue" }]
+
+        ns.updateStats()
+        ns.updatePlayedList()
+
+        return availableSongs
     }
 
     // Safely returns the primary requester name from a queue item.
