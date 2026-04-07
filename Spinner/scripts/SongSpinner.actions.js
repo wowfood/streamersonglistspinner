@@ -8,7 +8,7 @@
             return
         }
 
-        const encodedStreamer = encodeURIComponent(ns.state.streamer)
+        const encodedStreamer = encodeURIComponent(ns.state.streamer).trim().toLowerCase()
 
         // Always use full API URL (no backend proxy in this app)
         ns.state.api = `https://api.streamersonglist.com/v1/streamers/${encodedStreamer}/queue`
