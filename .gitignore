@@ -2,3 +2,7 @@
 /.idea/encodings.xml
 /.idea/indexLayout.xml
 /.idea/vcs.xml
+/.idea/jsLibraryMappings.xml
+/node_modules
+/server-config.json
+/server-token.json

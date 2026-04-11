@@ -2,10 +2,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Song Queue Spinner</title>
+    <title>Song Queue Spinner — Overlay</title>
     <link rel="stylesheet" href="SongSpinner.css">
 </head>
-<body>
+<body class="overlay-mode">
 
 <div id="container">
     <div id="wheelSection">
@@ -13,26 +13,26 @@
         <div id="pointer"></div>
         <div id="wheelContainer"></div>
 
-        <div id="buttonContainer">
-            <button id="spinButton" onclick="spin()">SPIN</button>
+        <!-- Hidden — required by shared JS but not shown on overlay -->
+        <div id="buttonContainer" style="display:none;">
+            <button id="spinButton">SPIN</button>
         </div>
 
         <div id="status" style="display:none;"></div>
         </div>
     </div>
 
-    <div id="resizeHandle"></div>
+    <div id="resizeHandle" style="display:none;"></div>
 
     <div id="playedList">
         <div id="playedListTop">
-            <button id="collapseBtn" class="collapse-button" onclick="togglePlayedListCollapse()" title="Collapse/Expand Played List">
+            <button id="collapseBtn" class="collapse-button" onclick="togglePlayedListCollapse()" title="Collapse/Expand Played List" style="display:none;">
                 <span id="collapseIcon">◀</span>
             </button>
             <div id="streamerSection">
-                <input type="text" id="streamerInput" placeholder="Enter streamer name..." onchange="loadStreamer()" style="display:block;">
-                <span id="streamerLabel" style="display:none;"></span>
-                <button id="changeStreamerBtn" class="small-button" onclick="changeStreamer()" style="display:none;">Change</button>
-                <button id="refreshSongsBtn" class="small-button"  onclick="loadStreamer()">Refresh</button>
+                <input type="text" id="streamerInput" style="display:none;">
+                <span id="streamerLabel"></span>
+                <button id="changeStreamerBtn" class="small-button" style="display:none;"></button>
             </div>
         </div>
         <div id="playedListContent">
@@ -41,8 +41,8 @@
             <h3>Queued Songs:  <span id="availableCount">0</span></h3>
         </div>
         <ul id="playedSongsUl"></ul>
-            <div class="toggle-container">
-                <button id="resetBtn" class="small-button" onclick="resetPlayed()" style="display:none">Reset</button>
+            <div class="toggle-container" style="display:none;">
+                <button id="resetBtn" class="small-button" style="display:none;"></button>
                 <div class="toggle-right">
                     <span class="toggle-label">Toggle Wheel</span>
                     <label class="switch">
@@ -74,7 +74,7 @@
 <script src="scripts/SongSpinner.ui.js"></script>
 <script src="scripts/SongSpinner.actions.js"></script>
 <script src="scripts/SongSpinner.sync.js"></script>
-<script src="scripts/SongSpinner.bootstrap.js"></script>
+<script src="scripts/SongSpinner.overlay-bootstrap.js"></script>
 
 </body>
 </html>

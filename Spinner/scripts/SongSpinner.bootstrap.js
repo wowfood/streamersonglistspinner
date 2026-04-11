@@ -39,6 +39,7 @@
                 if (value) {
                     try {
                         await ns.refreshQueueData()
+                        ns.sync?.send('set_streamer', { streamer: ns.state.streamer })
                     } catch (err) {
                         console.error("Auto refresh failed:", err)
                     }
@@ -67,6 +68,6 @@
         }
     })
 
-    // Start the application.
-    ns.initialize()
+    // Start the application, then connect to the sync server as the control panel.
+    ns.initialize().then(() => ns.sync.init('control'))
 }) (window.SongSpinner)

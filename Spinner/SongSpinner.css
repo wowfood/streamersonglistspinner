@@ -395,6 +395,16 @@ input:checked + .slider:before {
     100% { transform:translateY(115vh) rotate(540deg); opacity:0.85; }
 }
 
+/* Overlay mode: hide the entire played list panel when collapsed (no button visible on stream) */
+body.overlay-mode #playedList.collapsed {
+    display: none !important;
+}
+
+/* Overlay mode: always hide interactive controls regardless of JS overrides */
+body.overlay-mode #changeStreamerBtn {
+    display: none !important;
+}
+
 /* Responsive breakpoints for smaller screens */
 @media (max-width: 1200px) {
     #wheelContainer{

@@ -8,7 +8,7 @@
 
         const encodedStreamer = encodeURIComponent(ns.state.streamer).trim().toLowerCase()
         const period = ns.state.appConfig.songList?.playHistoryPeriod || ns.defaultConfig.songList.playHistoryPeriod
-        const url = `https://api.streamersonglist.com/v1/streamers/${encodedStreamer}/playHistory?size=200&current=0&period=${encodeURIComponent(period)}`
+        const url = `https://api.streamersonglist.com/v1/streamers/${encodedStreamer}/playHistory?size=200&current=0&period=${encodeURIComponent(period)}&type=playedAt&order=desc`
 
         try {
             const res = await fetch(url)
