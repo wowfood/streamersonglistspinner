@@ -1,0 +1,53 @@
+@page "/home"
+@inject TwitchAuthService TwitchAuth
+@implements IDisposable
+
+<div class="ss-home">
+    @if (TwitchAuth.IsAuthenticated)
+    {
+        <div class="ss-home-card">
+            <div class="ss-home-twitch-icon">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+                </svg>
+            </div>
+            <h2>Welcome, @TwitchAuth.DisplayName!</h2>
+            <p class="ss-home-hint">Logged in with Twitch. AutoPlay chat commands are available.</p>
+            <div class="ss-home-actions">
+                <a href="/dashboard" class="ss-btn ss-btn-primary">Open Dashboard</a>
+                <a href="/settings" class="ss-btn ss-btn-secondary">Settings</a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="ss-home-card">
+            <h1>SonglistSpinner</h1>
+            <p class="ss-home-hint">Login with Twitch to enable AutoPlay — automatically sending <code>!setSong</code>
+                and <code>!setPlayed</code> to your chat on each spin.</p>
+            <div class="ss-home-actions">
+                <a href="/dashboard" class="ss-btn ss-btn-secondary">Use Without Login</a>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        TwitchAuth.AuthStateChanged += OnAuthStateChanged;
+    }
+
+    private void OnAuthStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        TwitchAuth.AuthStateChanged -= OnAuthStateChanged;
+    }
+
+}

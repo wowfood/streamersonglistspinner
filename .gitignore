@@ -1,4 +1,50 @@
-﻿/.idea/.gitignore
-/.idea/encodings.xml
-/.idea/indexLayout.xml
-/.idea/vcs.xml
+# .NET build artifacts
+**/bin/
+**/obj/
+
+# Publish output
+**/publish/
+**/Properties/PublishProfiles/
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# Visual Studio / Rider
+.vs/
+.idea/
+*.user
+*.suo
+*.rsuser
+
+# Sensitive config (use dotnet user-secrets or environment variables instead)
+**/appsettings.Development.json
+**/appsettings.Local.json
+
+# Node.js
+node_modules/
+dist/
+npm-debug.log*
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+
+# Logs
+*.log
+
+# Azure Functions local secrets
+**/local.settings.json
+
+# Azurite local Azure Storage emulator state
+AzuriteConfig
+__azurite_db_*.json
+__blobstorage__/
+
+# Installer build output and redistributables
+**/installer_output/
+**/redist/
+
+# Claude Code local (machine-specific) settings
+.claude/settings.local.json

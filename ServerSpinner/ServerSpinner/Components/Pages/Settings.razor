@@ -1,0 +1,207 @@
+@page "/settings"
+@attribute [Authorize]
+@inject HttpClient Http
+
+<PageTitle>Settings — ServerSpinner</PageTitle>
+
+<h1 style="color:#6441a5; margin-bottom:1.5rem;">Settings</h1>
+
+@if (_dto == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="_dto" OnValidSubmit="Save">
+        <section class="ss-settings-section">
+            <h3>Queue Source</h3>
+            <div class="ss-field">
+                <label>Default StreamerSongList Name</label>
+                <InputText @bind-Value="_dto.DefaultStreamerName" placeholder="e.g. wowfood"/>
+                <div class="ss-field-hint">Auto-loads this streamer when you open the Dashboard.</div>
+            </div>
+            <div class="ss-field">
+                <label>
+                    <InputCheckbox @bind-Value="_dto.HideChangeOptionWhenDefault"/>
+                    Hide &ldquo;Change Streamer&rdquo; button when default name is set
+                </label>
+            </div>
+        </section>
+
+        <section class="ss-settings-section">
+            <h3>Song List</h3>
+            <div class="ss-field">
+                <label>Display Fields</label>
+                <div class="ss-field-multiselect">
+                    @for (var i = 0; i < _vm.DisplayFields.Count; i++)
+                    {
+                        var idx = i;
+                        var field = _vm.DisplayFields[i];
+                        <div
+                            class="ss-chip @(field.Selected ? "ss-chip-selected" : "ss-chip-unselected") @(_vm.DragOverIdx == idx && _vm.DragIdx != idx ? "ss-chip-drag-over" : "")"
+                            draggable="true"
+                            @ondragstart="@(() =>
+                                          {
+                                              _vm.DragIdx = idx;
+                                              _vm.DragOverIdx = -1;
+                                          })"
+                            @ondragenter="@(() => _vm.DragOverIdx = idx)"
+                            @ondragover:preventDefault
+                            @ondrop="@(() => _vm.DropField(idx))"
+                            @ondragend="@(() =>
+                                        {
+                                            _vm.DragIdx = -1;
+                                            _vm.DragOverIdx = -1;
+                                        })"
+                            @onclick="@(() => _vm.ToggleField(idx))">
+                            <span class="ss-chip-handle">⠿</span>
+                            @field.Name
+                        </div>
+                    }
+                </div>
+                <div class="ss-field-hint">Click to toggle. Drag to reorder. Purple = included in display.</div>
+            </div>
+            <div class="ss-field">
+                <label>
+                    <InputCheckbox @bind-Value="_dto.ExcludePlayedSongs"/>
+                    Exclude already-played songs from the wheel
+                </label>
+            </div>
+            <div class="ss-field">
+                <label>Play History Period</label>
+                <InputSelect @bind-Value="_dto.PlayHistoryPeriod">
+                    <option value="stream">This stream</option>
+                    <option value="day">Today</option>
+                    <option value="week">This week</option>
+                    <option value="month">This month</option>
+                    <option value="all">All time</option>
+                </InputSelect>
+            </div>
+            <div class="ss-field">
+                <label>Played List Position</label>
+                <InputSelect @bind-Value="_dto.PlayedListPosition">
+                    <option value="right">Right</option>
+                    <option value="left">Left</option>
+                </InputSelect>
+            </div>
+        </section>
+
+        <section class="ss-settings-section">
+            <h3>Wheel</h3>
+            <div class="ss-field">
+                <label>Wheel Colors (one per line)</label>
+                <InputTextArea @bind-Value="_vm.WheelColorsRaw" rows="5"/>
+                <div class="ss-field-hint">Enter hex values like #ff6b6b, one per line.</div>
+            </div>
+        </section>
+
+        <section class="ss-settings-section">
+            <h3>Background</h3>
+            <div class="ss-field">
+                <label>Mode</label>
+                <InputSelect @bind-Value="_dto.BackgroundMode">
+                    <option value="color">Solid color</option>
+                    <option value="transparent">Transparent (for OBS chroma key)</option>
+                </InputSelect>
+            </div>
+            <div class="ss-field">
+                <label>Background Color</label>
+                <input type="color" @bind="_dto.BackgroundColor"/>
+            </div>
+        </section>
+
+        <section class="ss-settings-section">
+            <h3>Played List Appearance</h3>
+            <div class="ss-field">
+                <label>Font Family</label>
+                <InputSelect @bind-Value="_dto.PlayedListFontFamily">
+                    <option value="sans-serif">Sans-serif</option>
+                    <option value="serif">Serif</option>
+                    <option value="monospace">Monospace</option>
+                    <option value="Arial">Arial</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Tahoma">Tahoma</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="'Times New Roman'">Times New Roman</option>
+                    <option value="'Courier New'">Courier New</option>
+                    <option value="Impact">Impact</option>
+                </InputSelect>
+            </div>
+            <div class="ss-field">
+                <label>Font Size</label>
+                <InputText @bind-Value="_dto.PlayedListFontSize" placeholder="0.875rem"/>
+            </div>
+            <div class="ss-field">
+                <label>Max Lines per Item</label>
+                <InputNumber @bind-Value="_dto.PlayedListMaxLines" min="1" max="5"/>
+            </div>
+        </section>
+
+        <section class="ss-settings-section">
+            <h3>Colors</h3>
+            <div class="ss-color-grid">
+                <div class="ss-field">
+                    <label>Text</label>
+                    <input type="color" @bind="_dto.ColorText"/>
+                </div>
+                <div class="ss-field">
+                    <label>Pointer</label>
+                    <input type="color" @bind="_dto.ColorPointer"/>
+                </div>
+                <div class="ss-field">
+                    <label>Button Background</label>
+                    <input type="color" @bind="_dto.ColorButtonBackground"/>
+                </div>
+                <div class="ss-field">
+                    <label>Button Text</label>
+                    <input type="color" @bind="_dto.ColorButtonText"/>
+                </div>
+                <div class="ss-field">
+                    <label>Played List Background</label>
+                    <input type="color" value="@_vm.PlayedListBgHex"
+                           @oninput="@(e => _vm.PlayedListBgHex = e.Value?.ToString() ?? _vm.PlayedListBgHex)"/>
+                    <div class="ss-opacity-row">
+                        <label class="ss-opacity-label">Opacity</label>
+                        <input type="range" class="ss-opacity-slider" min="0" max="1" step="0.05"
+                               value="@_vm.PlayedListBgAlpha.ToString(CultureInfo.InvariantCulture)"
+                               @oninput="@(e =>
+                                         {
+                                             if (double.TryParse(e.Value?.ToString(), NumberStyles.Float, CultureInfo.InvariantCulture, out var v)) _vm.PlayedListBgAlpha = v;
+                                         })"/>
+                        <span class="ss-opacity-val">@($"{_vm.PlayedListBgAlpha * 100:F0}%")</span>
+                    </div>
+                </div>
+                <div class="ss-field">
+                    <label>Played Item Background</label>
+                    <input type="color" @bind="_dto.ColorPlayedItemBackground"/>
+                </div>
+            </div>
+        </section>
+
+        <section class="ss-settings-section">
+            <h3>AutoPlay</h3>
+            <div class="ss-field">
+                <label>
+                    <InputCheckbox @bind-Value="_dto.AutoPlay"/>
+                    Enable AutoPlay — send <code>!setSong</code> and <code>!setPlayed</code> to Twitch chat on each spin
+                </label>
+                <div class="ss-field-hint">Requires <code>user:write:chat</code> scope (already granted during Twitch
+                    login).
+                </div>
+            </div>
+        </section>
+
+        <div class="ss-save-bar">
+            <button type="submit">Save Settings</button>
+            @if (_vm.SaveSuccess)
+            {
+                <span class="ss-save-success">&#10003; Saved!</span>
+            }
+            @if (_vm.SaveError != null)
+            {
+                <span class="ss-save-error">&#10007; @_vm.SaveError</span>
+            }
+        </div>
+    </EditForm>
+}

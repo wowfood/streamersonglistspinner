@@ -1,0 +1,100 @@
+@page "/"
+@page "/dashboard"
+@layout MainLayout
+@inject IConfiguration Config
+@inject ISpinnerApiService ApiService
+@inject ISpinnerSyncService SyncService
+@inject ILocalSettingsService LocalSettings
+@inject IJSRuntime JS
+@inject OverlayStateService OverlayService
+@inject TwitchChatService TwitchChat
+@implements IAsyncDisposable
+
+<div id="container">
+    @if (_loading)
+    {
+        <div class="dashboard-loadingSection">
+            <MudProgressCircular Color="Color.Default" Size="Size.Large" Indeterminate="true"/>
+        </div>
+    }
+    else
+    {
+        <div id="wheelSection">
+            <div id="wheelContents">
+                <div id="pointer"></div>
+                <div id="wheelContainer"></div>
+                <div id="buttonContainer">
+                    <button id="spinButton" @onclick="Spin" disabled="@_spinDisabled">@_spinButtonText</button>
+                </div>
+                <div id="status" style="@(_statusVisible ? "display:block" : "display:none")">@_status</div>
+            </div>
+        </div>
+
+        <div id="resizeHandle"></div>
+
+        <div id="playedList" data-position="@_config.SongList.PlayedListPosition">
+            <div id="playedListTop">
+                <button id="collapseBtn" class="collapse-button" @onclick="ToggleCollapse"
+                        title="Collapse/Expand Played List">
+                    <span id="collapseIcon"></span>
+                </button>
+                <div id="streamerSection">
+                    @if (_showStreamerInput)
+                    {
+                        <input type="text" id="streamerInput" @bind="_streamerInput"
+                               placeholder="Enter streamer name..."
+                               @onkeydown="OnStreamerKeyDown"/>
+                        <button class="small-button" @onclick="LoadStreamer">Load</button>
+                    }
+                    else
+                    {
+                        <span id="streamerLabel">Streamer: @_currentStreamer</span>
+                        @if (!_isLockedDefault)
+                        {
+                            <button id="changeStreamerBtn" class="small-button" @onclick="ChangeStreamer">Change
+                            </button>
+                        }
+                    }
+                    <button id="refreshSongsBtn" class="small-button" @onclick="LoadStreamer">Refresh</button>
+                </div>
+            </div>
+            <div id="playedListContent">
+                <div id="soungCounterSection">
+                    <h3>Played Songs: <span id="playedCount">@_playedSongs.Length</span></h3>
+                    <h3>Queued Songs: <span id="availableCount">@_availableSongs.Count</span></h3>
+                </div>
+                <ul id="playedSongsUl">
+                    @foreach (var song in _playedSongs)
+                    {
+                        <li>@SpinnerDataService.CreatePlayedSongText(song, _config ?? new SpinnerConfig())</li>
+                    }
+                </ul>
+            </div>
+            <div class="toggle-container">
+                @if (!string.IsNullOrEmpty(_currentStreamer))
+                {
+                    <button id="resetBtn" class="small-button" @onclick="ResetPlayed">Reset</button>
+                }
+                <div class="toggle-right">
+                    <span class="toggle-label">Toggle Wheel</span>
+                    <label class="switch">
+                        <input type="checkbox" id="showWheelCheckbox" checked="@_wheelVisible"
+                               @onchange="OnWheelToggle"/>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div id="winnerModal" class="winner-modal" style="@(_winnerVisible ? "display:block" : "display:none")">
+    <div class="winner-modal-backdrop" @onclick="CloseWinnerModal"></div>
+    <div class="winner-modal-content" role="dialog" aria-modal="true" aria-labelledby="winnerTitle">
+        <div id="winnerConfetti" class="winner-confetti"></div>
+        <h2 id="winnerTitle">Winner</h2>
+        <p id="winnerMainLine" class="winner-main-line">@_winnerMainLine</p>
+        <p id="winnerDetails" class="winner-details">@_winnerDetails</p>
+        <button class="small-button" @onclick="CloseWinnerModal">Close</button>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+@page "/overlay/{StreamerId:guid}"
+@layout SpinnerLayout
+@inject IConfiguration Config
+@inject ISpinnerApiService ApiService
+@inject ISpinnerSyncService SyncService
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<HeadContent>
+    <title>Overlay — ServerSpinner</title>
+    <link rel="stylesheet" href="/spinner/SongSpinner.css?v=@BuildInfo.CacheBuster"/>
+</HeadContent>
+
+<div id="container">
+    <div id="wheelSection">
+        <div id="wheelContents">
+            <div id="pointer"></div>
+            <div id="wheelContainer"></div>
+        </div>
+    </div>
+
+    <div id="resizeHandle" style="display:none;"></div>
+
+    <div id="playedList" data-position="@_config.SongList.PlayedListPosition">
+        <div id="playedListTop">
+            <button id="collapseBtn" class="collapse-button" @onclick="ToggleCollapse"
+                    title="Collapse/Expand Played List">
+                <span id="collapseIcon"></span>
+            </button>
+            <div id="streamerSection">
+                <span id="streamerLabel">@_currentStreamer</span>
+            </div>
+        </div>
+        <div id="playedListContent">
+            <div id="soungCounterSection">
+                <h3>Played Songs: <span id="playedCount">@_playedSongs.Length</span></h3>
+                <h3>Queued Songs: <span id="availableCount">@_availableSongs.Count</span></h3>
+            </div>
+            <ul id="playedSongsUl">
+                @foreach (var song in _playedSongs)
+                {
+                    <li>@SpinnerDataService.CreatePlayedSongText(song, _config ?? new SpinnerConfig())</li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="winnerModal" class="winner-modal" style="@(_winnerVisible ? "display:block" : "display:none")">
+    <div class="winner-modal-backdrop" @onclick="CloseWinnerModal"></div>
+    <div class="winner-modal-content" role="dialog" aria-modal="true" aria-labelledby="winnerTitle">
+        <div id="winnerConfetti" class="winner-confetti"></div>
+        <h2 id="winnerTitle">Winner</h2>
+        <p id="winnerMainLine" class="winner-main-line">@_winnerMainLine</p>
+        <p id="winnerDetails" class="winner-details">@_winnerDetails</p>
+        <button class="small-button" @onclick="CloseWinnerModal">Close</button>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/spin-wheel@5.0.2/dist/spin-wheel-iife.js"></script>
+<script src="/spinner/SongSpinner.interop.js?v=@BuildInfo.CacheBuster"></script>

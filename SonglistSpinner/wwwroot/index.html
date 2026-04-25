@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+          name="viewport"/>
+    <title>SonglistSpinner</title>
+    <base href="/"/>
+    <link href="app.css" rel="stylesheet"/>
+    <link href="SonglistSpinner.styles.css" rel="stylesheet"/>
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet"/>
+    <link href="spinner/SongSpinner.css" rel="stylesheet"/>
+    <link href="data:," rel="icon">
+</head>
+
+<body>
+
+<div class="status-bar-safe-area"></div>
+
+<div id="app">Loading...</div>
+
+<div data-nosnippet id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a class="reload" href=".">Reload</a>
+    <span class="dismiss">🗙</span>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/spin-wheel@5.0.2/dist/spin-wheel-iife.js"></script>
+<script src="spinner/SongSpinner.interop.js"></script>
+<script src="_content/MudBlazor/MudBlazor.min.js"></script>
+<script autostart="false" src="_framework/blazor.webview.js"></script>
+
+</body>
+
+</html>

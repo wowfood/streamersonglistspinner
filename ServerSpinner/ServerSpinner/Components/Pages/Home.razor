@@ -1,0 +1,90 @@
+@page "/"
+@inject NavigationManager Nav
+@inject IConfiguration Config
+
+<PageTitle>ServerSpinner — Song Queue Spinner for Streamers</PageTitle>
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <div class="ss-hero">
+                <h1>ServerSpinner</h1>
+                <p>Welcome back, <strong>@context.User.Identity?.Name</strong>!</p>
+                <div class="ss-logged-in-actions">
+                    <a href="/dashboard" class="ss-btn-primary" data-enhance-nav="false">&#9654; Open Dashboard</a>
+                    <a href="/settings" class="ss-btn-secondary">&#9881; Settings</a>
+                </div>
+                <div class="ss-overlay-url">
+                    <span>Overlay URL:</span>
+                    <input type="text" readonly
+                           value="@GetOverlayUrl(context.User)"
+                           id="overlay-url-input"/>
+                    <button onclick="navigator.clipboard.writeText(document.getElementById('overlay-url-input').value)">
+                        Copy
+                    </button>
+                </div>
+            </div>
+        </Authorized>
+        <NotAuthorized>
+            <div class="ss-hero">
+                <h1>ServerSpinner</h1>
+                <p>Randomly spin songs from your StreamerSongList queue — with a live overlay for OBS.</p>
+                <a href="@(Config["ApiBaseUrl"])/api/auth/twitch/login" class="ss-btn-twitch">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path
+                            d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+                    </svg>
+                    Login with Twitch
+                </a>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
+
+<section>
+    <h2>What is ServerSpinner?</h2>
+    <p>
+        ServerSpinner is a multi-user SaaS tool that lets Twitch streamers spin a randomised wheel to pick the next song
+        from their
+        <a href="https://streamersonglist.com" target="_blank">StreamerSongList</a> queue.
+        Each streamer gets their own dashboard, a customisable stream overlay, and optional AutoPlay integration with
+        Twitch chat.
+    </p>
+    <div class="ss-features">
+        <div class="ss-feature-card">
+            <h3>&#127911; Song Wheel</h3>
+            <p>A canvas-based spinning wheel pulls live from your SSL queue. Hit spin and let fate decide.</p>
+        </div>
+        <div class="ss-feature-card">
+            <h3>&#128506; Live Overlay</h3>
+            <p>Add your overlay URL as a browser source in OBS. It updates in real-time as you spin.</p>
+        </div>
+        <div class="ss-feature-card">
+            <h3>&#128100; Multi-User</h3>
+            <p>Every streamer has their own isolated dashboard and settings. No shared state.</p>
+        </div>
+        <div class="ss-feature-card">
+            <h3>&#128172; AutoPlay</h3>
+            <p>Optionally send <code>!setSong</code> and <code>!setPlayed</code> to Twitch chat automatically on each
+                spin.</p>
+        </div>
+        <div class="ss-feature-card">
+            <h3>&#127912; Customisable</h3>
+            <p>Wheel colours, background, played list appearance, song fields — all configurable per user.</p>
+        </div>
+        <div class="ss-feature-card">
+            <h3>&#128274; Secure</h3>
+            <p>Login via Twitch OAuth. Only you can access your dashboard. Overlays use a private GUID URL.</p>
+        </div>
+    </div>
+</section>
+
+<section>
+    <h2>How to get started</h2>
+    <ol class="ss-steps">
+        <li><strong>Login with Twitch</strong> — click the button above to connect your account.</li>
+        <li><strong>Set your StreamerSongList name</strong> — visit Settings and enter your SSL streamer name.</li>
+        <li><strong>Add the overlay to OBS</strong> — copy your overlay URL and add it as a Browser Source.</li>
+        <li><strong>Open the Dashboard</strong> — load your queue, hit SPIN, and enjoy the show.</li>
+    </ol>
+</section>
