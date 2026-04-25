@@ -1,0 +1,7 @@
+<Project>
+    <PropertyGroup>
+        <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+        <EnableMsixTooling>true</EnableMsixTooling>
+        <WindowsAppSDKSingleFileVerifyConfiguration>false</WindowsAppSDKSingleFileVerifyConfiguration>
+    </PropertyGroup>
+</Project>

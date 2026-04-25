@@ -1,0 +1,243 @@
+@page "/settings"
+@inject ILocalSettingsService LocalSettings
+@inject IConfiguration Config
+@inject TwitchAuthService TwitchAuth
+
+<h1 style="color:#6441a5; margin-bottom:1rem;">Settings</h1>
+
+@if (_dto == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <EditForm Model="_dto" OnValidSubmit="Save">
+
+        <div class="ss-settings-grid">
+
+            @* Left column *@
+            <div>
+                <section class="ss-settings-section">
+                    <h3>Queue Source</h3>
+                    <div class="ss-field">
+                        <label>Default StreamerSongList Name</label>
+                        <InputText @bind-Value="_dto.DefaultStreamerName" placeholder="e.g. wowfood"/>
+                        <div class="ss-field-hint">Auto-loads this streamer when you open the Dashboard.</div>
+                    </div>
+                    <div class="ss-field">
+                        <label>
+                            <InputCheckbox @bind-Value="_dto.HideChangeOptionWhenDefault"/>
+                            Hide &ldquo;Change Streamer&rdquo; button when default name is set
+                        </label>
+                    </div>
+                </section>
+
+                <section class="ss-settings-section">
+                    <h3>AutoPlay (Twitch Chat)</h3>
+                    <div class="ss-field">
+                        <label>
+                            <InputCheckbox @bind-Value="_dto.AutoPlay"/>
+                            Send <code>!setSong</code> and <code>!setPlayed</code> on each spin
+                        </label>
+                        <div class="ss-field-hint">Requires Twitch login and <code>user:write:chat</code> scope.</div>
+                    </div>
+                    <div class="ss-field">
+                        @if (TwitchAuth.IsAuthenticated)
+                        {
+                            <span class="ss-auth-status ss-auth-ok">&#10003; Logged in as @TwitchAuth.DisplayName</span>
+                        }
+                        else
+                        {
+                            <span class="ss-auth-status ss-auth-none">Not logged in &mdash; <a href="/">Login on Home page</a></span>
+                        }
+                    </div>
+                </section>
+
+                <section class="ss-settings-section">
+                    <h3>Background</h3>
+                    <div class="ss-field">
+                        <label>Mode</label>
+                        <InputSelect @bind-Value="_dto.BackgroundMode">
+                            <option value="color">Solid color</option>
+                            <option value="transparent">Transparent (for OBS chroma key)</option>
+                        </InputSelect>
+                    </div>
+                    <div class="ss-field ss-field-row">
+                        <label>Background Color</label>
+                        <div class="ss-color-preview" style="background:@_dto.BackgroundColor">
+                            <MudColorPicker PickerVariant="PickerVariant.Inline"
+                                            ShowAlpha="false"
+                                            @bind-Value="ColorBackground"/>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="ss-settings-section">
+                    <h3>Played List Appearance</h3>
+                    <div class="ss-field">
+                        <label>Font Family</label>
+                        <InputSelect @bind-Value="_dto.PlayedListFontFamily">
+                            <option value="sans-serif">Sans-serif</option>
+                            <option value="serif">Serif</option>
+                            <option value="monospace">Monospace</option>
+                            <option value="Arial">Arial</option>
+                            <option value="Helvetica">Helvetica</option>
+                            <option value="Verdana">Verdana</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="'Courier New'">Courier New</option>
+                        </InputSelect>
+                    </div>
+                    <div class="ss-field">
+                        <label>Font Size</label>
+                        <InputText @bind-Value="_dto.PlayedListFontSize" placeholder="0.875rem"/>
+                    </div>
+                    <div class="ss-field">
+                        <label>Max Lines per Item</label>
+                        <InputNumber @bind-Value="_dto.PlayedListMaxLines" min="1" max="5"/>
+                    </div>
+                </section>
+            </div>
+
+            @* Right column *@
+            <div>
+                <section class="ss-settings-section">
+                    <h3>Song List</h3>
+                    <div class="ss-field">
+                        <label>Display Fields</label>
+                        <div class="ss-field-multiselect">
+                            @for (var i = 0; i < _vm.DisplayFields.Count; i++)
+                            {
+                                var idx = i;
+                                var field = _vm.DisplayFields[i];
+                                <div
+                                    class="ss-chip @(field.Selected ? "ss-chip-selected" : "ss-chip-unselected") @(_vm.DragOverIdx == idx && _vm.DragIdx != idx ? "ss-chip-drag-over" : "")"
+                                    draggable="true"
+                                    @ondragstart="@(() =>
+                                                  {
+                                                      _vm.DragIdx = idx;
+                                                      _vm.DragOverIdx = -1;
+                                                  })"
+                                    @ondragover="@(_ =>
+                                                 {
+                                                     if (_vm.DragOverIdx != idx) _vm.DragOverIdx = idx;
+                                                 })"
+                                    @ondragover:preventDefault
+                                    @ondrop="@(() => _vm.DropField(idx))"
+                                    @ondragend="@(() =>
+                                                {
+                                                    _vm.DragIdx = -1;
+                                                    _vm.DragOverIdx = -1;
+                                                })"
+                                    @onclick="@(() => _vm.ToggleField(idx))">
+                                    <span class="ss-chip-handle">⠿</span>
+                                    @field.Name
+                                </div>
+                            }
+                        </div>
+                        <div class="ss-field-hint">Click to toggle. Drag to reorder. Purple = included in display.</div>
+                    </div>
+                    <div class="ss-field">
+                        <label>
+                            <InputCheckbox @bind-Value="_dto.ExcludePlayedSongs"/>
+                            Exclude already-played songs from the wheel
+                        </label>
+                    </div>
+                    <div class="ss-field">
+                        <label>Play History Period</label>
+                        <InputSelect @bind-Value="_dto.PlayHistoryPeriod">
+                            <option value="stream">This stream</option>
+                            <option value="day">Today</option>
+                            <option value="week">This week</option>
+                            <option value="month">This month</option>
+                            <option value="all">All time</option>
+                        </InputSelect>
+                    </div>
+                    <div class="ss-field">
+                        <label>Played List Position</label>
+                        <InputSelect @bind-Value="_dto.PlayedListPosition">
+                            <option value="right">Right</option>
+                            <option value="left">Left</option>
+                        </InputSelect>
+                    </div>
+                </section>
+
+                <section class="ss-settings-section">
+                    <h3>Wheel</h3>
+                    <div class="ss-field">
+                        <label>Wheel Colors (one per line)</label>
+                        <InputTextArea @bind-Value="_vm.WheelColorsRaw" rows="5"/>
+                        <div class="ss-field-hint">Enter hex values like #ff6b6b, one per line.</div>
+                    </div>
+                </section>
+            </div>
+
+            @* Full-width Colors section *@
+            <section class="ss-settings-section ss-settings-section-full">
+                <h3>Colors</h3>
+                <div class="ss-color-grid">
+                    <div class="ss-field ss-field-row">
+                        <label>Text</label>
+                        <div class="ss-color-preview" style="background:@_dto.ColorText">
+                            <MudColorPicker PickerVariant="PickerVariant.Inline"
+                                            ShowAlpha="false"
+                                            @bind-Value="ColorText"/>
+                        </div>
+                    </div>
+                    <div class="ss-field ss-field-row">
+                        <label>Pointer</label>
+                        <div class="ss-color-preview" style="background:@_dto.ColorPointer">
+                            <MudColorPicker PickerVariant="PickerVariant.Inline"
+                                            ShowAlpha="false"
+                                            @bind-Value="ColorPointer"/>
+                        </div>
+                    </div>
+                    <div class="ss-field ss-field-row">
+                        <label>Button Background</label>
+                        <div class="ss-color-preview" style="background:@_dto.ColorButtonBackground">
+                            <MudColorPicker PickerVariant="PickerVariant.Inline"
+                                            ShowAlpha="false"
+                                            @bind-Value="ColorButtonBg"/>
+                        </div>
+                    </div>
+                    <div class="ss-field ss-field-row">
+                        <label>Button Text</label>
+                        <div class="ss-color-preview" style="background:@_dto.ColorButtonText">
+                            <MudColorPicker PickerVariant="PickerVariant.Inline"
+                                            ShowAlpha="false"
+                                            @bind-Value="ColorButtonText"/>
+                        </div>
+                    </div>
+                    <div class="ss-field ss-field-row">
+                        <label>Played List Background</label>
+                        <div class="ss-color-preview" style="background:@_vm.ComputedPlayedListBg()">
+                            <MudColorPicker PickerVariant="PickerVariant.Inline"
+                                            @bind-Value="ColorPlayedListBg"/>
+                        </div>
+                    </div>
+                    <div class="ss-field ss-field-row">
+                        <label>Played Item Background</label>
+                        <div class="ss-color-preview" style="background:@_dto.ColorPlayedItemBackground">
+                            <MudColorPicker PickerVariant="PickerVariant.Inline"
+                                            ShowAlpha="false"
+                                            @bind-Value="ColorPlayedItemBg"/>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <div class="ss-save-bar">
+            <button type="submit">Save Settings</button>
+            @if (_vm.SaveSuccess)
+            {
+                <span class="ss-save-success">&#10003; Saved!</span>
+            }
+            @if (_vm.SaveError != null)
+            {
+                <span class="ss-save-error">&#10007; @_vm.SaveError</span>
+            }
+        </div>
+
+    </EditForm>
+}

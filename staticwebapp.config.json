@@ -1,0 +1,15 @@
+{
+  "navigationFallback": {
+    "rewrite": "/index.html",
+    "exclude": ["/api/*", "/_framework/*", "/spinner/*", "/overlay/*", "/*.css", "/*.js", "/*.ico", "/*.png", "/*.svg"]
+  },
+  "routes": [
+    {
+      "route": "/api/*",
+      "allowedRoles": ["anonymous"]
+    }
+  ],
+  "globalHeaders": {
+    "Cache-Control": "no-store"
+  }
+}
