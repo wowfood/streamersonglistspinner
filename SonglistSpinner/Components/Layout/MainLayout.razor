@@ -1,0 +1,86 @@
+@inherits LayoutComponentBase
+@inject OverlayStateService OverlayService
+@inject TwitchAuthService TwitchAuth
+@inject ISnackbar Snackbar
+@implements IDisposable
+
+<nav class="ss-nav">
+    <a class="ss-nav__brand" href="/">SonglistSpinner</a>
+    <div class="ss-nav__links">
+        <a href="/dashboard">Dashboard</a>
+        <a href="/settings">Settings</a>
+        <button class="ss-nav__btn" @onclick="CopyOverlayUrl">Copy Overlay URL</button>
+        <a href="https://ko-fi.com/wowfood" target="_blank" rel="noopener noreferrer">Donate</a>
+        @if (TwitchAuth.IsAuthenticated)
+        {
+            <button class="ss-nav__btn" @onclick="Logout">Logout</button>
+        }
+        else
+        {
+            <button class="ss-nav__btn" @onclick="LoginWithTwitch">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M11.571 4.714h1.715v5.143H11.57zm4.715 0H18v5.143h-1.714zM6 0L1.714 4.286v15.428h5.143V24l4.286-4.286h3.428L22.286 12V0zm14.571 11.143l-3.428 3.428h-3.429l-3 3v-3H6.857V1.714h13.714z"/>
+                </svg>
+                Login with Twitch
+            </button>
+        }
+    </div>
+</nav>
+
+@Body
+
+<MudPopoverProvider/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+@code {
+
+    protected override void OnInitialized()
+    {
+        TwitchAuth.AuthStateChanged += OnAuthStateChanged;
+    }
+
+    private async Task CopyOverlayUrl()
+    {
+        await Clipboard.SetTextAsync(OverlayService.OverlayUrl);
+        Snackbar.Add("Overlay URL copied!", Severity.Success, config =>
+        {
+            config.ShowCloseIcon = false;
+            config.VisibleStateDuration = 2000;
+            config.BackgroundBlurred = false;
+            config.ActionColor = Color.Info;
+            config.SnackbarVariant = Variant.Filled;
+            config.DuplicatesBehavior = SnackbarDuplicatesBehavior.Prevent;
+        });
+    }
+
+    private async Task LoginWithTwitch()
+    {
+        var url = TwitchAuth.GetAuthUrl();
+        try
+        {
+            await Launcher.OpenAsync(new Uri(url));
+        }
+        catch
+        {
+            await Console.Error.WriteAsync("Failed to open Twitch auth URL");
+        }
+    }
+
+    private async Task Logout()
+    {
+        await TwitchAuth.ClearAsync();
+    }
+
+    private void OnAuthStateChanged()
+    {
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        TwitchAuth.AuthStateChanged -= OnAuthStateChanged;
+    }
+
+}

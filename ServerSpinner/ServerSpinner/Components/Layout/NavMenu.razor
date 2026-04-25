@@ -1,0 +1,25 @@
+@inject IConfiguration Config
+
+<CascadingAuthenticationState>
+    <AuthorizeView>
+        <Authorized>
+            <nav class="ss-nav">
+                <a class="ss-nav__brand" href="/">ServerSpinner</a>
+                <div class="ss-nav__links">
+                    <a href="/dashboard" data-enhance-nav="false">Dashboard</a>
+                    <a href="/settings">Settings</a>
+                    <a href="@(Config["ApiBaseUrl"])/api/auth/twitch/logout" class="ss-nav__logout">Logout
+                        (@context.User.Identity?.Name)</a>
+                </div>
+            </nav>
+        </Authorized>
+        <NotAuthorized>
+            <nav class="ss-nav">
+                <a class="ss-nav__brand" href="/">ServerSpinner</a>
+                <div class="ss-nav__links">
+                    <a href="@(Config["ApiBaseUrl"])/api/auth/twitch/login" class="ss-nav__login">Login with Twitch</a>
+                </div>
+            </nav>
+        </NotAuthorized>
+    </AuthorizeView>
+</CascadingAuthenticationState>
